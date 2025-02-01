@@ -27,29 +27,6 @@ func getHostname() string {
 	return strings.TrimSpace(out.String())
 }
 
-func listar(all bool) {
-	ifaces := interfaces.List(all)
-	fmt.Println("➡ ", rainbow.Color("Lista De Interfaces De Red"), "🌐")
-
-	longest := 0
-	for _, iface := range ifaces {
-		length := len(interfaces.RemoveANSI(iface))
-		if length > longest {
-			longest = length
-		}
-	}
-	longest -= 6
-	tline, bline, bbline := "┌"+strings.Repeat("─", longest)+"┐", "└"+strings.Repeat("─", longest)+"┘", "└"+strings.Repeat("─", longest)+"┘"
-
-	fmt.Println(tline)
-	cabecera := " Nº Estado Adm.    Estado\t    Tipo\t    Nombre" + strings.Repeat(" ", longest-58)
-	fmt.Println("│", rainbow.Color(cabecera), "│")
-	fmt.Println(bline)
-	fmt.Println(tline)
-	fmt.Println(strings.Join(ifaces, "\n"))
-	fmt.Println(bbline)
-}
-
 func clear() {
 	if runtime.GOOS == "windows" {
 		cmd := exec.Command("cmd", "/c", "cls")
@@ -102,7 +79,7 @@ func main() {
 				bar.Add(1)
 				time.Sleep(8 * time.Millisecond)
 			}
-			listar(true)
+			interfaces.PrintList(true)
 			println("Presione Enter para continuar...")
 			reader.ReadString('\n')
 		case 2:
@@ -126,7 +103,7 @@ func main() {
 						clear()
 						println("💻|", rainbow.Color("Configuración de Red ➡️ Configurar una red"), "🌐")
 						println()
-						listar(true)
+						interfaces.PrintList(true)
 						println()
 						print(fmt.Sprintf("\033[38;5;38mSeleccione una interfaz (1-%d): ", len(interfaces.List(true))))
 						ifaceB, _ := reader.ReadString('\n')
@@ -141,7 +118,7 @@ func main() {
 							os.Exit(1)
 						}
 					} else {
-						listar(false)
+						interfaces.PrintList(false)
 						reader.ReadString('\n')
 					}
 				}
