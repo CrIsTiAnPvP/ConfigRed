@@ -2,9 +2,9 @@ module configred/main
 
 go 1.23.4
 
-replace configred/interfaces => ../interfaces
+replace configred/interfacesv4 => ../interfacesv4
 
-require configred/interfaces v0.0.0-00010101000000-000000000000
+require configred/interfacesv4 v0.0.0-00010101000000-000000000000
 
 replace configred/rainbow => ../rainbow
 

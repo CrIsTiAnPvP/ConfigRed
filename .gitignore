@@ -1,0 +1,12 @@
+# Configuración de IDE
+.vscode/
+
+# Binarios
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binario de testeo de la app
+*.test
