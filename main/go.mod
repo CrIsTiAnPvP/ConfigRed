@@ -4,11 +4,15 @@ go 1.23.4
 
 replace configred/interfacesv4 => ../interfacesv4
 
-require configred/interfacesv4 v0.0.0-00010101000000-000000000000
+require configred/interfacesv4 v0.5.0
 
 replace configred/rainbow => ../rainbow
 
-require configred/rainbow v0.0.0-00010101000000-000000000000
+require configred/rainbow v1.0.0
+
+replace configred/utils => ../utils
+
+require configred/utils v0.0.1
 
 require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect

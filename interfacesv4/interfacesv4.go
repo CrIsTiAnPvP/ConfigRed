@@ -2,16 +2,12 @@ package interfacesv4
 
 import (
 	"configred/rainbow"
+	"configred/utils"
 	"fmt"
 	"os/exec"
 	"regexp"
 	"strings"
 )
-
-func RemoveANSI(input string) string {
-	re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-	return re.ReplaceAllString(input, "")
-}
 
 func List(everything bool) []string {
 	var ifaces []string
@@ -44,7 +40,7 @@ func PrintList(all bool) {
 
 	longest := 0
 	for _, iface := range ifaces {
-		length := len(RemoveANSI(iface))
+		length := len(utils.RemoveANSI(iface))
 		if length > longest {
 			longest = length
 		}
@@ -92,36 +88,7 @@ func ParseList(ifaces []string, everything bool) []string {
 		}
 	}
 
-	return makeBorders(parsed)
-}
-
-func makeBorders(items []string) []string {
-	var longest int
-	for _, line := range items {
-		length := len(RemoveANSI(line))
-		if strings.Contains(line, "\t") {
-			length -= 4
-		}
-		if length > longest {
-			longest = length
-		}
-	}
-
-	for i, iface := range items {
-		rem := longest - len(RemoveANSI(iface)) - func() int {
-			if strings.Contains(iface, "\t") {
-				return 4
-			} else {
-				return 0
-			}
-		}()
-		if rem > 0 {
-			items[i] = iface + strings.Repeat(" ", rem) + "│"
-		} else {
-			items[i] = iface + "│"
-		}
-	}
-	return items
+	return utils.MakeBorders(parsed)
 }
 
 func GetConfig(iface string) []string {
@@ -186,13 +153,13 @@ func ParseConfig(config []string) []string {
 			parsed = append(parsed, "│"+rainbow.Color(" Servidores WINS configurados --> ")+value)
 		}
 	}
-	return makeBorders(parsed)
+	return utils.MakeBorders(parsed)
 }
 
 func PrintConfig(config []string) {
 	var longest int
 	for _, line := range config {
-		length := len(RemoveANSI(line))
+		length := len(utils.RemoveANSI(line))
 		if strings.Contains(line, "\t") {
 			length -= 4
 		}
@@ -209,4 +176,37 @@ func PrintConfig(config []string) {
 	println(tline)
 	println(strings.Join(config, "\n"))
 	println(bline)
+}
+
+func SetDinamic(iface string) {
+	cmd := exec.Command("netsh", "interface", "ip", "set", "address", iface, "dhcp")
+	err := cmd.Run()
+	if err != nil {
+		return
+	}
+	cmd = exec.Command("netsh", "interface", "ip", "set", "dns", iface, "dhcp")
+	err = cmd.Run()
+	if err != nil {
+		return
+	}
+
+}
+
+func SetStatic(iface string, ip string, mask string, gw string, dns1 string, dns2 string) {
+	cmd := exec.Command("netsh", "interface", "ip", "set", "address", "name=\""+iface+"\"", "static", ip, mask, gw)
+	err := cmd.Run()
+	if err != nil {
+		println(err)
+		return
+	}
+	cmd = exec.Command("netsh", "interface", "ip", "set", "dns", iface, "static", dns1, "primary")
+	err = cmd.Run()
+	if err != nil {
+		return
+	}
+	cmd = exec.Command("netsh", "interface", "ip", "add", "dns", iface, dns2, "index=2")
+	err = cmd.Run()
+	if err != nil {
+		return
+	}
 }
